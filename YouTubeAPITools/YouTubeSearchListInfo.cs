@@ -14,48 +14,25 @@ namespace YouTubeAPI
         Playlists = 0x4,
         All = 0x7
     }
-
-    public class YouTubeSearchListInfo
-    {
-        public List<VideoInfo> videos = new List<VideoInfo>();
-        public List<ChannelInfo> channels = new List<ChannelInfo>();
-        public List<PlaylistInfo> playlists = new List<PlaylistInfo>();
-    }
-
-    public class VideoInfo
+    
+    public abstract class YoutubeSearchResult
     {
         public string Title { get; set; }
+    }
+
+    public class VideoResult : YoutubeSearchResult
+    {
         public string Description { get; set; }
         public DateTime? PublishedAt { get; set; }
-
-        public VideoInfo(string title, string desc, DateTime? publishedAt)
-        {
-            Title = title;
-            Description = desc;
-            PublishedAt = publishedAt;
-        }
     }
 
-    public class ChannelInfo
+    public class ChannelResult : YoutubeSearchResult
     {
         public string ChannelId { get; set; }
-        public string ChannelTitle { get; set; }
-        public ChannelInfo(string channelId, string channelTitle)
-        {
-            ChannelId = channelId;
-            ChannelTitle = channelTitle;
-        }
     }
 
-    public class PlaylistInfo
+    public class PlaylistInfo : YoutubeSearchResult
     {
-        public string Title { get; set; }
         public string Description { get; set; }
-
-        public PlaylistInfo(string title, string desc)
-        {
-            Title = title;
-            Description = desc;
-        }
     }
 }
