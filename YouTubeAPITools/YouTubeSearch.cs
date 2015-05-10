@@ -9,8 +9,8 @@ namespace YouTubeAPI
 {
     public class YouTubeSearch
     {
-        public string APIKey { get; set; }
-        public string ApplicationName { get; set; }
+        private readonly string APIKey;
+        private readonly string ApplicationName;
 
         /// <summary>
         /// 
