@@ -32,7 +32,7 @@ namespace YouTubeAPI
         /// <param name="maxResults">Specify how many results will be returned</param>
         /// <param name="type">Type of the search. E.g videos or playlists only</param>
         /// <returns>Returns a list of videos, channels and playlists for a given search query</returns>
-        public async Task<YouTubeSearchListInfo> RetreiveList(string searchQuery, long maxResults, SearchType type)
+        public async Task<IEnumerable<YouTubeSearchResult>> RetreiveList(string searchQuery, long maxResults, SearchType type)
         {
             if (String.IsNullOrWhiteSpace(searchQuery))
             {
@@ -53,27 +53,15 @@ namespace YouTubeAPI
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
-            var searchListInfo = new YouTubeSearchListInfo();
-
-            // Add each result to the appropriate list
-            foreach (var searchResult in searchListResponse.Items)
-            {
+            return searchListResponse.Items.Select(searchResult => {
                 if (searchResult.Id.Kind == "youtube#video" && type.HasFlag(SearchType.Videos))
-                {
-                    searchListInfo.videos.Add(new VideoInfo(searchResult.Snippet.Title, searchResult.Snippet.Description, searchResult.Snippet.PublishedAt));
-                }
-
+                    return new VideoResult { Title = searchResult.Snippet.Title, Description = searchResult.Snippet.Description };
                 if (searchResult.Id.Kind == "youtube#channel" && type.HasFlag(SearchType.Channels))
-                {
-                    searchListInfo.channels.Add(new ChannelInfo(searchResult.Snippet.ChannelTitle, searchResult.Snippet.ChannelTitle));
-                }
-
-                if (searchResult.Id.Kind == "youtube#playlist" && type.HasFlag(SearchType.Playlists))
-                {
-                    searchListInfo.playlists.Add(new PlaylistInfo(searchResult.Snippet.Title, searchResult.Snippet.Description));
-                }
-            }
-            return searchListInfo;
+                    return new ChannelResult { Title = searchResult.Snippet.ChannelTitle, ChannelId = searchResult.Snippet.ChannelTitle };
+                if (searchResult.Id.Kind == "youtube#playlist" && type.HasFlag(SearchType.Playlist))
+                    return new PlaylistResult { Title = searchResult.Snippet.Title, Description = searchResult.Snippet.Description };
+                return null;
+            }).Where(x => x != null);
         }
     }
 }
