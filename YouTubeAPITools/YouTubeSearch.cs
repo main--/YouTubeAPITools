@@ -53,7 +53,7 @@ namespace YouTubeAPI
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
-            return searchListResponse.Items.Select(searchResult => {
+            return searchListResponse.Items.Select<DerTypVonYoutubeDenDuRausfindestIndemDuÜber_searchResult_hoverst, YoutubeSearchResult__oderWieAuchImmerDeinTypHeisst>(searchResult => {
                 if (searchResult.Id.Kind == "youtube#video" && type.HasFlag(SearchType.Videos))
                     return new VideoResult { Title = searchResult.Snippet.Title, Description = searchResult.Snippet.Description };
                 if (searchResult.Id.Kind == "youtube#channel" && type.HasFlag(SearchType.Channels))
