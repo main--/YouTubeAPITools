@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace YouTubeAPI
 {
-    public enum SearchType : ushort
+    [Flags]
+    public enum SearchType : int
     {
-        All,
-        Videos,
-        Channels,
-        Playlists
+        Videos = 0x1,
+        Channels = 0x2,
+        Playlists = 0x4,
+        All = 0x7
     }
 
     public class YouTubeSearchListInfo
