@@ -1,0 +1,100 @@
+﻿using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace YouTubeAPI
+{
+    public class YouTubeSearch
+    {
+        #region properties 
+        private string _APIKey;
+
+        public string APIKey
+        {
+            get { return _APIKey; }
+            set { _APIKey = value; }
+        }
+
+        private string _ApplicationName;
+
+        public string ApplicationName
+        {
+            get { return _ApplicationName; }
+            set { _ApplicationName = value; }
+        }
+        #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="apiKey">YouTube APIKey for authoriziation purposes</param>
+        /// <param name="applicationName">Is needed for static purposes</param>
+        public YouTubeSearch(string apiKey, string applicationName)
+        {
+            APIKey = apiKey;
+            ApplicationName = applicationName;
+        }
+
+        /// <summary>
+        /// Search for videos, channels and playlists
+        /// </summary>
+        /// <param name="searchQuery">What are you searching for?</param>
+        /// <param name="maxResults">Specify how many results will be returned</param>
+        /// <param name="type">Type of the search. E.g videos or playlists only</param>
+        /// <returns>Returns a list of videos, channels and playlists for a given search query</returns>
+        public async Task<YouTubeSearchListInfo> RetreiveList(string searchQuery, long maxResults, SearchType type)
+        {
+            if (String.IsNullOrWhiteSpace(searchQuery))
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (maxResults <= 0)
+            {
+                throw new ArgumentOutOfRangeException("The amount of maximum results can not be zero or lower");
+            }
+
+            BaseClientService.Initializer init = new BaseClientService.Initializer();
+            init.ApiKey = APIKey;
+            init.ApplicationName = ApplicationName;
+
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = APIKey,
+                ApplicationName = ApplicationName
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet");
+            searchListRequest.Q = searchQuery;
+            searchListRequest.MaxResults = maxResults;
+
+            // Call the search.list method to retrieve results matching the specified query term.
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+
+            YouTubeSearchListInfo searchListInfo = new YouTubeSearchListInfo();
+
+            // Add each result to the appropriate list
+            foreach (var searchResult in searchListResponse.Items)
+            {
+                if (searchResult.Id.Kind == "youtube#video" && (type == SearchType.Videos || type == SearchType.All))
+                {
+                    searchListInfo.videos.Add(new VideoInfo(searchResult.Snippet.Title, searchResult.Snippet.Description, searchResult.Snippet.PublishedAt));
+                }
+
+                if (searchResult.Id.Kind == "youtube#channel" && (type == SearchType.Channels || type == SearchType.All))
+                {
+                    searchListInfo.channels.Add(new ChannelInfo(searchResult.Snippet.ChannelTitle, searchResult.Snippet.ChannelTitle));
+                }
+
+                if (searchResult.Id.Kind == "youtube#playlist" && (type == SearchType.Playlists || type == SearchType.All))
+                {
+                    searchListInfo.playlists.Add(new PlaylistInfo(searchResult.Snippet.Title, searchResult.Snippet.Description));
+                }
+            }
+            return searchListInfo;
+        }
+    }
+}
