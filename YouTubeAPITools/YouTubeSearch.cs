@@ -58,17 +58,17 @@ namespace YouTubeAPI
             // Add each result to the appropriate list
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#video" && (type == SearchType.Videos || type == SearchType.All))
+                if (searchResult.Id.Kind == "youtube#video" && type.HasFlag(SearchType.Videos))
                 {
                     searchListInfo.videos.Add(new VideoInfo(searchResult.Snippet.Title, searchResult.Snippet.Description, searchResult.Snippet.PublishedAt));
                 }
 
-                if (searchResult.Id.Kind == "youtube#channel" && (type == SearchType.Channels || type == SearchType.All))
+                if (searchResult.Id.Kind == "youtube#channel" && type.HasFlag(SearchType.Channels))
                 {
                     searchListInfo.channels.Add(new ChannelInfo(searchResult.Snippet.ChannelTitle, searchResult.Snippet.ChannelTitle));
                 }
 
-                if (searchResult.Id.Kind == "youtube#playlist" && (type == SearchType.Playlists || type == SearchType.All))
+                if (searchResult.Id.Kind == "youtube#playlist" && type.HasFlag(SearchType.Playlists))
                 {
                     searchListInfo.playlists.Add(new PlaylistInfo(searchResult.Snippet.Title, searchResult.Snippet.Description));
                 }
