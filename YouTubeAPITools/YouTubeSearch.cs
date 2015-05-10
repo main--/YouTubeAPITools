@@ -9,8 +9,7 @@ namespace YouTubeAPI
 {
     public class YouTubeSearch
     {
-        private readonly string APIKey;
-        private readonly string ApplicationName;
+        private readonly BaseClientService.Initializer APIInitializer;
 
         /// <summary>
         /// 
@@ -19,8 +18,11 @@ namespace YouTubeAPI
         /// <param name="applicationName">Is needed for static purposes</param>
         public YouTubeSearch(string apiKey, string applicationName)
         {
-            APIKey = apiKey;
-            ApplicationName = applicationName;
+            APIInitializer = new BaseClientService.Initializer()
+            {
+                ApiKey = apiKey,
+                ApplicationName = applicationName
+            };
         }
 
         /// <summary>
@@ -42,11 +44,7 @@ namespace YouTubeAPI
                 throw new ArgumentOutOfRangeException("The amount of maximum results can not be zero or lower");
             }
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = APIKey,
-                ApplicationName = ApplicationName
-            });
+            var youtubeService = new YouTubeService(APIInitializer);
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchQuery;
