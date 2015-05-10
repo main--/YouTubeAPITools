@@ -9,23 +9,8 @@ namespace YouTubeAPI
 {
     public class YouTubeSearch
     {
-        #region properties 
-        private string _APIKey;
-
-        public string APIKey
-        {
-            get { return _APIKey; }
-            set { _APIKey = value; }
-        }
-
-        private string _ApplicationName;
-
-        public string ApplicationName
-        {
-            get { return _ApplicationName; }
-            set { _ApplicationName = value; }
-        }
-        #endregion
+        public string APIKey { get; set; }
+        public string ApplicationName { get; set; }
 
         /// <summary>
         /// 
@@ -49,17 +34,13 @@ namespace YouTubeAPI
         {
             if (String.IsNullOrWhiteSpace(searchQuery))
             {
-                throw new ArgumentNullException();
+                throw new ArgumentException("searchQuery");
             }
 
             if (maxResults <= 0)
             {
                 throw new ArgumentOutOfRangeException("The amount of maximum results can not be zero or lower");
             }
-
-            BaseClientService.Initializer init = new BaseClientService.Initializer();
-            init.ApiKey = APIKey;
-            init.ApplicationName = ApplicationName;
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -74,7 +55,7 @@ namespace YouTubeAPI
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
-            YouTubeSearchListInfo searchListInfo = new YouTubeSearchListInfo();
+            var searchListInfo = new YouTubeSearchListInfo();
 
             // Add each result to the appropriate list
             foreach (var searchResult in searchListResponse.Items)
